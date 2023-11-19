@@ -1,0 +1,120 @@
+---
+title: "STA 445"
+author: "Constant Yaokumah"
+subtitle: "6260662"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Q8. 1 create vectors,label and sum
+```{r, }
+vec_a <- c(2,4,6)
+vec_b <- c(8,10,12)
+vec_c <- vec_a + vec_b
+vec_c
+```
+## Q8. 2 Add vectors
+```{r}
+vec_d <- c(14,20)
+vec_d + vec_a
+```
+The vector d = (14,20), however, R recreate the vector d as (14,20,14) because the length of d did not correspond to vector a 
+Warning: longer object length is not a multiple of shorter object length[1] 16 24 20
+
+
+## Q8. 3 Add 5
+```{r }
+vec_a + 5   # R refers to the 5 as a scalar added to each vector in vec_a
+```
+When 5 was added, R create the 5 as a scalar adding to each element in the vector a, hence no warning 
+
+
+## Q8. 4  Generating vectors
+```{r }
+seq(1,5)  #a
+1:5    #b
+```
+
+## Q8. 5 Generating vectors of even numbers
+```{r,}
+seq(2,20,2)  #a
+2*(1:10)   #b
+```
+
+## Q8. 6 vector of 21 elemnet from 0 to 1 
+```{r}
+x <- seq(from =0, to = 1, length.out = 21)
+x
+```
+
+## Q8. 7 Using rep 
+```{r}
+rep(c(2,4,8),3)
+```
+
+## Q8. 8  Using rep for each
+```{r}
+rep(c(2,4,8), each= 4)
+```
+
+
+## Q8. 10 Matrix 
+```{r}
+M = matrix(seq(2,30,2), nrow = 3, ncol = 5, byrow = TRUE) #a
+M
+## matrix using seq and cbind
+rbind(seq(2,10,2), seq(12,20,2),seq(22,30,2)) #a i
+
+M[2,] #b
+
+M[3,2]
+```
+
+## Q8. 12 Dataframe and deleting NA
+```{r }
+df <- data.frame(name= c('Alice','Bob','Charlie','Daniel'),
+                     Grade = c(6,8,NA,9))
+    
+df[ -which(  is.na(df$Grade) ), ] 
+df[  which( !is.na(df$Grade) ), ]
+
+```
+ Both copes perform the same work, however, the difference lies on how the copes are written , the first (is.na) select any (NA) and (-which) removes or delete that row while the second is (!is.na) removes the row which any (NA) 
+ 
+## Q8. 14 List named of element
+```{r}
+x = c(4,5,6,7,8,9,10)
+y = c(34,35,41,40,45,47,51)
+slope = 2.82
+p.value = 0.000131
+
+my.test <- list(x = x,y = y,slope = slope,p.value = p.value)
+my.test #a
+my.test[2] #b
+
+my.test$p.value   # my.test['p.value'] c
+```
+
+## Q 9 1 Example_5
+```{r}
+library(readxl)
+Example_5 <- read_excel('Example_5.xls', sheet ='RawData',range = "A5:C36")
+head(Example_5)  
+str(Example_5)
+```
+
+
+## Q 9 2 Example_3
+```{r }
+Example_3 <- read_excel('Example_3.xls',sheet = 'data', range = "A1:L34", na = c('NA', '-9999'))
+tail(Example_3) # 
+```
+
+
+
+
+

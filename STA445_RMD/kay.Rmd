@@ -1,0 +1,81 @@
+---
+title: "STA 445"
+author: "Constant Yaokumah"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Q8. 1
+```{r, }
+vec_a <- c(2,4,6)
+vec_b <- c(8,10,12)
+vec_c <- vec_a + vec_b
+vec_c
+```
+## Q8. 2
+```{r}
+vec_d <- c(14,20)
+vec_d + vec_a
+```
+
+## Q8. 3
+```{r }
+vec_a + 5   # R refers to the 5 as a scalar added to each vector in vec_a
+```
+
+## Q8. 4
+```{r }
+seq(1,5)  #a
+1:5    #b
+```
+
+## Q8. 5
+```{r,}
+seq(2,20,2)  #a
+2*(1:10)   #b
+```
+
+## Q8. 6
+```{r}
+x <- seq(from =0, to = 1, length.out = 21)
+x
+```
+
+## Q8. 7
+```{r}
+rep(c(2,4,8),3)
+```
+
+## Q8. 8
+```{r}
+rep(c(2,4,8), each= 4)
+```
+
+## Q8. 9
+```{r}
+letters
+letters[1:9]
+letters[c(9,11,19)]
+letters[1:24] 
+```
+
+## Q8. 10
+```{r}
+M = matrix(seq(2,30,2), nrow = 3, ncol = 5, byrow = TRUE) #a
+M
+rbind(seq(2,10,2), seq(12,20,2),seq(22,30,2)) #ai
+
+M[2,] #b
+
+M[3,2]
+```
+
+
+
+
+
+

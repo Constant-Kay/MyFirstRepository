@@ -1,0 +1,44 @@
+---
+title: "Untitled"
+author: "CONSTANT YAOKUMAH"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(lubridate)
+```
+
+
+```{r}
+Survey <- read.csv('https://www.lock5stat.com/datasets3e/StudentSurvey.csv', na.strings=c('',' ')) 
+Survey
+Survey_filter <- Survey %>% drop_na(Sex,Year)
+Response_count <- Survey_filter %>% count(Sex, Year)
+Response_counts <- Response_count %>%
+  mutate(Year = factor(Year, levels = c("First Year", "Sophomore", "Junior", "Senior")))
+Response_counts
+Response_table <- Response_counts %>%
+  pivot_wider(names_from = Year, values_from = n)
+colnames(Response_table) <- c("Gender", "First Year", "Sophomore", "Junior", "Senior")
+Response_table
+
+
+```
+
+```{r}
+url <- "https://raw.githubusercontent.com/dereksonderegger/444/master/data-raw/FlagMaxTemp.csv"
+data <- read.csv(url)
+data
+
+```
+
+
+
+

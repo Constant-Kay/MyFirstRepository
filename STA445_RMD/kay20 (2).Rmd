@@ -1,0 +1,159 @@
+---
+title: "STA 445"
+subtitle: "6260662"
+author: "Constant Yaokumah"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
+```
+
+## Q1 a dunif
+```{r}
+duniform <- function(x,a,b){
+  if(a <= x & x <= b){
+    output = 1/(b-a)
+  }else{
+    output = 0
+  }
+  
+  return(output)
+}
+duniform(-20,1,10)
+duniform(6,1,10)
+duniform(20,1,10)
+
+```
+
+## Q1 b using loop(for)
+```{r }
+duniform <- function(x, a, b){
+  output <- NULL
+  for( i in 1 : length(x)){  
+      if( x[i] >= a & x[i] <= b ){ 
+        output[i] = 1/(b-a)
+    }else{
+      output[i] = 0
+    }
+  }
+  return(output)
+}
+duniform(1:8,2,20)
+
+```
+
+## Q1 bi, verify above code
+```{r, fig.height=3}
+library(dplyr)
+library(ggplot2)
+data.frame( x=seq(-1, 12, by=.001) ) %>%
+    mutate( y = duniform(x, 4, 8) ) %>%
+    ggplot( aes(x=x, y=y) ) +
+    geom_step()
+```
+
+## Q1 c using (microbenchmark)
+```{r}
+library(microbenchmark)
+microbenchmark::microbenchmark( duniform( seq(-4,12,by=.0001), 4, 8), times=100)
+```
+
+
+## Q1 d using ifelse statement
+```{r}
+duniform1 <- function(x, a, b){
+   output <- ifelse(x>=a & x <= b, 1/(b-a),0)
+   return(output)
+}
+duniform1(1:21,2,20)
+
+```
+## Q 1d verify plot
+```{r,fig.height=3}
+library(dplyr)
+library(ggplot2)
+data.frame( x=seq(-1, 12, by=.001) ) %>%
+    mutate( y = duniform1(x, 4, 8) ) %>%
+    ggplot( aes(x=x, y=y) ) +
+    geom_step()
+
+```
+## Q 1 d verify microbenchmark
+```{r}
+library(microbenchmark)
+microbenchmark::microbenchmark( duniform1( seq(-4,12,by=.0001), 4, 8), times=100)
+```
+ Codes in Question 1d are much easier to write and run faster compared to Question 1 b
+
+
+## Q2 setting default values
+
+```{r}
+duniform2 <- function(x,min = 0, max = 1){
+  output <- ifelse(x>=min & x <= max, 1/(max-min),0)
+  return(output)
+}
+duniform2(1:7,2,20)
+duniform2(3)
+```
+
+## Q3
+```{r}
+standardize <- function(x){
+  (x-mean(x))/sd(x)
+    }
+    
+data( 'iris' )
+
+ggplot(iris, aes(x=Sepal.Length, y=Sepal.Width, color=Species)) +
+  geom_point() +
+  labs(title='Pre-Transformation')
+    
+iris.z <- iris %>% mutate( across(where(is.numeric), standardize) )
+    
+ggplot(iris.z, aes(x=Sepal.Length, y=Sepal.Width, color=Species)) +
+   geom_point() +
+labs(title='Post-Transformation')
+
+```
+
+## Q4 Using paste and %%
+
+```{r}
+
+Fizz_Buzz_Game <- function(n){
+ output <- c()
+  for( i in 1:length(n)){
+    output[i] <- ""
+    if(i %% 3 == 0){output[i] <- paste(output[i], "Fizz")}
+    if(i %% 5 == 0){output[i] <-  paste(output[i], "Buzz")}
+    if(output[i] == ""){output[i] <- i}
+  }
+ return(output)
+}
+
+Fizz_Buzz_Game(1:50)
+
+```
+
+
+
+## Q5 Filling NA
+ 
+```{r}
+myFill <- function(x){
+for(i in 1:length(x)){
+  if(is.na(x[i])){
+    x[i] =x[i-1]
+    }
+  }
+return(x)
+}
+
+test.vector <- c('A',NA,NA, 'B','C', NA,NA,NA)
+myFill(test.vector)
+
+```
+

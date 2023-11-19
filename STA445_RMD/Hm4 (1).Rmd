@@ -1,0 +1,307 @@
+---
+title: "Untitled"
+author: "CONSTANT YAOKUMAH"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(stringr)
+library(ggplot2)
+```
+
+## Q1
+```{r}
+Survey <- read.csv('https://www.lock5stat.com/datasets3e/StudentSurvey.csv', na.strings=c('',' ')) 
+Survey_filter <- Survey %>% drop_na(Sex,Year)
+Response_count <- Survey_filter %>% count(Sex, Year)
+Response_counts <- Response_count %>%
+  mutate(Year = factor(Year, levels = c("First Year", "Sophomore", "Junior", "Senior")))
+Response_counts
+Response_table <- Response_counts %>%
+  pivot_wider(names_from = Year, values_from = n) 
+
+colnames(Response_table) <- c("Gender", "First Year", "Sophomore", "Junior", "Senior")
+Response_table
+
+
+```
+
+
+## Q2a
+```{r}
+url <- "https://raw.githubusercontent.com/dereksonderegger/444/master/data-raw/FlagMaxTemp.csv"
+data <- read.csv(url)
+dataMax  <- data %>% filter(Year == 2005) 
+
+dataPivot <- dataMax %>% pivot_longer( 
+    X1:X31,                # which columns to apply this to
+    names_to  = 'Day',   # What should I call the column of old column names
+    values_to = 'Temperature')
+
+dataClean  <-dataPivot %>% pull(Day) %>% str_replace(pattern='X', replacement='') 
+
+dataCleanTemp <- dataPivot %>% mutate(Day=dataClean, Year=as.character(Year), Month =as.character(Month))%>%drop_na() 
+dataCleanTemp1 <-dataCleanTemp %>% mutate(Date=lubridate::ymd(paste(Year,Month,Day)))
+
+
+
+dataCleanTemp1 %>% ggplot(aes(x=Date, y=Temperature)) +geom_line()
+```
+## Q2b 
+ Create a line graph that gives the monthly average maximum temperature
+        for 2013 - 2015. Again the x-axis should be the date and the axis
+        spans 3 years.
+
+```{r}
+
+dataPivot <- data %>% filter(between(Year,2013,2015)) %>%pivot_longer( 
+    X1:X31,                # which columns to apply this to
+    names_to  = 'Day',   # What should I call the column of old column names
+    values_to = 'Temperature') %>% group_by(Year,Month) %>% drop_na() 
+
+dataCleanSum <- dataPivot %>% summarise(Average=mean(Temperature), .groups='drop') %>% mutate(
+  Date = lubridate::ym(paste(Year,Month))
+)
+
+dataCleanSum %>% ggplot(aes(x=Date, y=Average)) +geom_line()
+
+```
+
+
+
+##Q4 Using cbind,rbind and join
+
+```{r}
+A <-  tribble(
+~Name, ~Car,
+'Alice', 'Ford F150',
+'Bob',   'Tesla Model III',
+'Charlie', 'VW Bug')
+
+B <- tribble(
+ ~First.Name, ~Pet,
+ 'Bob',  'Cat',
+ 'Charlie', 'Dog',
+'Alice', 'Rabbit')
+AB_cbind <- cbind(A,B)
+AB_cbind
+
+AB_join <- inner_join(A,B, by = c("Name"= "First.Name"))
+AB_join
+
+```
+
+
+##Q4b Adding Alice pet Guinea Pig
+```{r}
+Alice_pet <- tribble(
+  ~First.Name, ~Pet,
+  'Alice', 'Guinea Pig'
+)
+Alice_pet
+
+B <- bind_rows(B,Alice_pet)
+B
+```
+
+
+## Q4c  Rejoining then with cbind
+```{r}
+#AB_cbind <- cbind(A,B)
+
+#AB_cbind
+```
+Error in data.frame due to differing number of rows: A =3rows, B =4rows, resulting in dimension error
+  
+
+
+##Q 4ci  Using join
+```{r}
+AB_join <- inner_join(A,B, by = c("Name" = "First.Name"))
+AB_join
+```
+
+
+## Q5 Questions
+
+```{r}
+Customers <- tribble(
+      ~PersonID, ~Name, ~Street, ~City, ~State,
+      1, 'Derek Sonderegger',  '231 River Run', 'Flagstaff', 'AZ',
+      2, 'Aubrey Sonderegger', '231 River Run', 'Flagstaff', 'AZ',
+      3, 'Robert Buscaglia', '754 Forest Heights', 'Flagstaff', 'AZ',
+      4, 'Roy St Laurent', '845 Elk View', 'Flagstaff', 'AZ')
+    
+    Retailers <- tribble(
+      ~RetailID, ~Name, ~Street, ~City, ~State,
+      1, 'Kickstand Kafe', '719 N Humphreys St', 'Flagstaff', 'AZ',
+      2, 'MartAnnes', '112 E Route 66', 'Flagstaff', 'AZ',
+      3, 'REI', '323 S Windsor Ln', 'Flagstaff', 'AZ' )
+    
+    Cards <- tribble(
+      ~CardID, ~PersonID, ~Issue_DateTime, ~Exp_DateTime,
+      '9876768717278723',  1,  '2019-9-20 0:00:00', '2022-9-20 0:00:00',
+      '5628927579821287',  2,  '2019-9-20 0:00:00', '2022-9-20 0:00:00',
+      '7295825498122734',  3,  '2019-9-28 0:00:00', '2022-9-28 0:00:00',
+      '8723768965231926',  4,  '2019-9-30 0:00:00', '2022-9-30 0:00:00' ) 
+    
+    Transactions <- tribble(
+      ~CardID, ~RetailID, ~DateTime, ~Amount,
+      '9876768717278723', 1, '2019-10-1 8:31:23',    5.68,
+      '7295825498122734', 2, '2019-10-1 12:45:45',  25.67,
+      '9876768717278723', 1, '2019-10-2 8:26:31',    5.68,
+      '9876768717278723', 1, '2019-10-2 8:30:09',    9.23,
+      '5628927579821287', 3, '2019-10-5 18:58:57',  68.54,
+      '7295825498122734', 2, '2019-10-5 12:39:26',  31.84,
+      '8723768965231926', 2, '2019-10-10 19:02:20', 42.83) 
+    
+    Cards <- Cards %>% 
+      mutate( Issue_DateTime = lubridate::ymd_hms(Issue_DateTime),
+              Exp_DateTime   = lubridate::ymd_hms(Exp_DateTime) )
+    Transactions <- Transactions %>% 
+      mutate( DateTime = lubridate::ymd_hms(DateTime))
+
+
+```
+
+
+
+## Q5a
+
+```{r}
+
+customer_name <- 'Derek Sonderegger'
+
+Derek_Statement <- Customers %>%
+  filter(Name == customer_name) %>%
+  select(PersonID) %>%
+  left_join(Cards, by = "PersonID") %>%
+  select(CardID) %>%
+  left_join(Transactions, by = "CardID") %>%
+  left_join(Retailers, by = "RetailID") %>% 
+  select(CardID,RetailID,DateTime, Amount, Name)
+
+Derek_Statement
+
+```
+
+##Q5b Aubre
+```{r}
+
+#Aubrey's information
+aubrey_info <- Customers %>%
+  filter(Name == 'Aubrey Sonderegger')
+
+#Aubrey's CardID and PersonID
+cardID <- Cards %>%
+  filter(PersonID == aubrey_info$PersonID) %>%
+  pull(CardID)
+
+personID <- aubrey_info$PersonID
+
+
+#Close the existing card
+Cards %>%
+  filter(CardID == cardID) %>%
+  mutate(Exp_DateTime = ymd_hms('2019-10-15 16:28:21'))
+
+#new CardID
+new_cardID <- '1234567890123456'
+
+#new row for Aubrey's new card
+new_card <- tibble(
+  CardID = new_cardID,
+  PersonID = personID,
+  Issue_DateTime = ymd_hms('2019-10-15 16:28:21'),
+  Exp_DateTime = ymd_hms('2022-10-15 16:28:21')
+)
+
+Cards <- rbind(Cards, new_card)
+Cards
+
+
+```
+
+
+## Q5c
+
+```{r}
+# Temporary variables for the new transaction
+card <- new_cardID
+retailid <- 2
+datetime <- ymd_hms('2019-10-16 14:30:21')
+amount <- 4.98
+
+#  the new transaction
+Valid_Cards <- Cards %>% 
+  filter(CardID == card, Issue_DateTime <= datetime, datetime <= Exp_DateTime)
+Valid_Cards
+
+if (nrow(Valid_Cards) == 1) {
+  new_transaction <- tibble(
+    CardID = card,
+    RetailID = retailid,
+    DateTime = datetime,
+    Amount = amount
+  )
+
+  Transactions <- rbind(Transactions, new_transaction)
+  Transactions
+} else {
+  print('Card Denied')
+}
+
+```
+
+## Q5d
+```{r}
+card <- '9876768717278723'
+retailid <- 2
+datetime <- ymd_hms('2019-10-17 00:00:00')
+amount <- 4.98  # Example nefarious amount
+
+Valid_Cards <- Cards %>%
+  filter(CardID == card, Issue_DateTime <= datetime, datetime <= Exp_DateTime)
+
+if (nrow(Valid_Cards) == 2) {
+  new_transaction <- tribble(
+    ~CardID, ~RetailID, ~DateTime, ~Amount,
+    card, retailid, datetime, amount
+  )
+  Transactions <- bind_rows(Transactions, new_transaction)
+  Transactions
+} else {
+  print('Card Denied')
+}
+
+```
+
+##Q5e
+```{r}
+customer_name <- 'Aubrey Sonderegger'
+
+Aubrey_Statement <- Customers %>%
+  filter(Name == customer_name) %>%
+  select(PersonID) %>%
+  left_join(Cards, by = "PersonID") %>%
+  select(CardID) %>%
+  left_join(Transactions, by = "CardID") %>%
+  left_join(Retailers, by = "RetailID")  %>% 
+  select(CardID,RetailID,DateTime, Amount, Name)
+
+Aubrey_Statement
+```
+
+
+
+
+
+
