@@ -1,2 +1,2 @@
 # MyFirstRepository
-contains all assignment works in R
+contains all assignments work in R
